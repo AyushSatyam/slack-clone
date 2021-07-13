@@ -129,7 +129,7 @@ export default class Register extends Component {
       <>
         <Grid textAlign="center" verticalAlign="middle" className="app">
           <Grid.Column style={{ maxWidth: 450 }}>
-            <Header as="h2" icon color="orange" textAlign="center">
+            <Header as="h1" icon color="orange" textAlign="center">
               <Icon name="puzzle piece" color="orange" />
               Register for Slack
             </Header>
