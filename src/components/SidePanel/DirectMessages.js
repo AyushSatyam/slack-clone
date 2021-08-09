@@ -1,12 +1,15 @@
 import React, { Component } from "react";
 import { Icon, Menu } from "semantic-ui-react";
 import firebase from "../../firebase";
-export default class DirectMessages extends Component {
+import { connect } from "react-redux";
+import { setCurrentChannel, setPrivateChannel } from "../../actions";
+class DirectMessages extends Component {
   state = {
+    activeChannel: "",
     users: [],
     user: this.props.currentUser,
     usersRef: firebase.database().ref("users"),
-    connectedRef: firebase.database().ref("/info/connected"),
+    connectedRef: firebase.database().ref(".info/connected"),
     presenceRef: firebase.database().ref("presence"),
   };
 
@@ -56,7 +59,7 @@ export default class DirectMessages extends Component {
   addStatusToUser = (userId, connected = true) => {
     const updatedUsers = this.state.users.reduce((acc, user) => {
       if (user.uid === userId) {
-        user["status"] = `${connected}?'online':'offline'`;
+        user["status"] = `${connected ? "online" : "offline"}`;
       }
       return acc.concat(user);
     }, []);
@@ -65,9 +68,33 @@ export default class DirectMessages extends Component {
     });
   };
 
+  changeChannel = (user) => {
+    const channelId = this.getChannelId(user.uid);
+    const channelData = {
+      id: channelId,
+      name: user.name,
+    };
+    this.props.setCurrentChannel(channelData);
+    this.props.setPrivateChannel(true);
+    this.setAciveChannel(user.uid);
+  };
+
+  getChannelId = (userId) => {
+    const currentUerId = this.state.user.id;
+    return userId < currentUerId
+      ? `${userId}/${currentUerId}`
+      : `${currentUerId}/${userId}`;
+  };
+
   isUserOnline = (user) => user.status === "online";
+
+  setAciveChannel = (userId) => {
+    this.setState({
+      activeChannel: userId,
+    });
+  };
   render() {
-    const { users } = this.state;
+    const { users, activeChannel } = this.state;
     return (
       <>
         <Menu.Menu className="menu">
@@ -80,8 +107,9 @@ export default class DirectMessages extends Component {
           </Menu.Item>
           {users.map((user) => (
             <Menu.Item
+              active={user.uid === activeChannel}
               key={user.uid}
-              onClick={() => console.log(user)}
+              onClick={() => this.changeChannel(user)}
               style={{ opacity: 0.8, fontStyle: "italic" }}
             >
               <Icon
@@ -96,3 +124,7 @@ export default class DirectMessages extends Component {
     );
   }
 }
+
+export default connect(null, { setCurrentChannel, setPrivateChannel })(
+  DirectMessages
+);

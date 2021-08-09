@@ -3,7 +3,7 @@ import { Header, Icon, Input, Segment } from "semantic-ui-react";
 
 export default class MessagesHeader extends Component {
   render() {
-    const { channelName, numUniqueUsers, handleSearchChange, searchLoading } =
+    const { channelName, numUniqueUsers, handleSearchChange, searchLoading, isPrivateChannel } =
       this.props;
     return (
       <>
@@ -16,7 +16,7 @@ export default class MessagesHeader extends Component {
           >
             <span>
               {channelName}
-              <Icon name={"star outline"} color="black" />
+              {!isPrivateChannel && <Icon name={"star outline"} color="black" />}
             </span>
             <Header.Subheader>{numUniqueUsers}</Header.Subheader>
           </Header>
